@@ -157,6 +157,7 @@ public class Gardenshift {
 					document.put("creation_date", new Date().toString());
 					document.put("email", emailAdd);
 					document.put("name", "");
+					document.put("status", new ArrayList());
 					document.put("picture", "http://www.worldbiofuelsmarkets.com/EF/Images/blank_profile_pic.jpg");
 					document.put("zipcode", ""); // HTML5 Geolocation API can
 													// also be used
@@ -177,7 +178,7 @@ public class Gardenshift {
 					BasicDBObject friends = new BasicDBObject();
 					friends.put("friends_username", "");
 					friends.put("status", "");
-					friends.put("friends", friends);
+					document.put("friends", friends);
 
 //					BasicDBObject user_crops = new BasicDBObject();
 //					user_crops.put("crop_name", "");
@@ -188,7 +189,7 @@ public class Gardenshift {
 //					user_crops.put("videos", "");
 //					user_crops.put("comments", "");
 //					document.put("user_crops", user_crops);
-					 document.put("user_crops", new ArrayList());
+					document.put("user_crops", new ArrayList());
 					
 					collection.insert(document);
 					
