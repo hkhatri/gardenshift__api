@@ -162,10 +162,10 @@ public class Gardenshift {
 					document.put("zipcode", ""); // HTML5 Geolocation API can
 													// also be used
 
-					BasicDBObject feedback = new BasicDBObject();
-					feedback.put("from", "");
-					feedback.put("text", "");
-					document.put("feedback", feedback);
+//					BasicDBObject feedback = new BasicDBObject();
+//					feedback.put("from", "");
+//					feedback.put("text", "");
+					document.put("feedback", new ArrayList());
 					
 					document.put("notifications_read", new ArrayList());
 
@@ -175,10 +175,10 @@ public class Gardenshift {
 
                     document.put("bulletin_archive", new ArrayList());
 
-					BasicDBObject friends = new BasicDBObject();
-					friends.put("friends_username", "");
-					friends.put("status", "");
-					document.put("friends", friends);
+//					BasicDBObject friends = new BasicDBObject();
+//					friends.put("friends_username", "");
+//					friends.put("status", "");
+					document.put("friends", new ArrayList());
 
 //					BasicDBObject user_crops = new BasicDBObject();
 //					user_crops.put("crop_name", "");
