@@ -98,58 +98,18 @@ public class Gardenshift {
 		 * Adds a new username to the database.
 		 */
 
-		Boolean userExists = false; // See if username already exists
-		Boolean emailExists = false; // See if email already exists
-		Boolean validEmail = false; // See if valid email address
-		Boolean validUsername = false; // See if valid email address
-		String user, email; // Stores username and email retrieved from mongoDB
-							// for verification
-
+	
 		String msg = ""; // Error message
 
 		try {
 			
 		//	userClass newUser = new userClass();
 
-			validEmail = isValidEmailAddress(emailAdd);
-
-			if (userID.length() < 6) {
-				msg = "Username should not be less than 6 characters";
-				return Response.status(200).entity(msg).build();
-
-			}
-
-			if (validEmail) {
-
-				DBCollection collection = db.getCollection("users");
-				BasicDBObject document = new BasicDBObject();
-
-				DBCursor cursor = collection.find();
-
-				while (cursor.hasNext()) {
-
-					BasicDBObject obj = (BasicDBObject) cursor.next();
-
-					user = obj.getString("username");
-					email = obj.getString("email");
-
-					if (user.equals(userID)) {
-						userExists = true;
-						msg = "failure-user already exists";
-
-					}
-
-					if (email.equals(emailAdd)) {
-						emailExists = true;
-						msg = "failure-email already exists";
-
-					}
-
-				}
+			
 
 				// If username or email is unique, create a new user
-				if (userExists == false && emailExists == false) {
-
+			DBCollection collection = db.getCollection("users");
+			BasicDBObject document = new BasicDBObject();
 					msg = "Success-user created";
 					document.put("username", userID);
 					document.put("password",
@@ -193,21 +153,15 @@ public class Gardenshift {
 					
 					collection.insert(document);
 					
-				}
-			}
+				
+		}
 
-			else {
-				msg = "Invalid Email Address";
-				return Response.status(200).entity(msg).build();
-			}
+		
 
-		} catch (UnknownHostException e) {
-			Response.status(500);
-		} catch (MongoException e) {
-			Response.status(500);
-		} catch (Exception e) {
+		
+		 catch (Exception e) {
 			// TODO Auto-generated catch block
-			Response.status(500);
+			return Response.status(200).entity(e).build();
 		}
 		return Response.status(200).entity(msg).build();
 
@@ -482,6 +436,7 @@ public class Gardenshift {
 	public Response update(@FormParam("username") String username,
 			@FormParam("name") String name, 
 			@FormParam("zip") String zip,
+			@FormParam("password") String password,
 			@FormParam("email") String email) {
 
 		/*
@@ -492,9 +447,10 @@ public class Gardenshift {
 		try {
 			DBCollection collection = db.getCollection("users");
 			BasicDBObject newDocument = new BasicDBObject().append("$set",
-					new BasicDBObject().append("name", name).append("email", email).append("zipcode", zip));
+					new BasicDBObject().append("name", name).append("email", email).append("zipcode", zip).append("password",
+							encryptPassword(password, "SHA-1", "UTF-8")));
 			
-			System.out.println(newDocument);
+		
 
 			collection.update(
 					new BasicDBObject().append("username", username),
@@ -1635,20 +1591,6 @@ public Response search_user_Crop(@PathParam("zipcode") String zipcode, @PathPara
 			temp.put("$push", new BasicDBObject("friends", document));
 
 			collection.update(update, temp, true, true);
-			
-			
-			BasicDBObject update1 = new BasicDBObject();
-			update1.put("username", username);
-
-			BasicDBObject document1 = new BasicDBObject();
-
-			document1.put("friends_username", friend_name);
-			document1.put("status", "pending");
-
-			BasicDBObject temp1 = new BasicDBObject();
-			temp1.put("$push", new BasicDBObject("friends", document1));
-
-			collection.update(update1, temp1, true, true);
 
 			return Response.status(200).entity("success").build();
 
