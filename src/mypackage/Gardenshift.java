@@ -708,15 +708,15 @@ public class Gardenshift {
 	}
 	
 	// Add a crop grown by user
-	@GET
-    @Path("create_usercrop/{username}/{name}/{quantity}/{date}/{comment}")
+	@POST
+    @Path("create_usercrop")
     @Produces("application/json")
     public Response addusercrop(
-            @PathParam("name") String name,
-            @PathParam("username") String username,
-            @PathParam("quantity") String quantity,
-            @PathParam("date") String date,
-            @PathParam("comment") String comment) {
+            @FormParam("name") String name,
+            @FormParam("username") String username,
+            @FormParam("quantity") String quantity,
+            @FormParam("date") String date,
+            @FormParam("comment") String comment) {
 
        
         try {
