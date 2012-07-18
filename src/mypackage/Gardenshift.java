@@ -294,8 +294,7 @@ public class Gardenshift {
 			BasicDBObject searchQuery = new BasicDBObject();
 			DBCollection collection = db.getCollection("users");
 
-			searchQuery.put("username",
-					java.util.regex.Pattern.compile(username));
+			searchQuery.put("username", username);
 			DBCursor cursor = collection.find(searchQuery);
 
 			if (cursor.hasNext() == false) {
