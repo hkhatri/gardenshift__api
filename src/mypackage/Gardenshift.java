@@ -37,13 +37,17 @@ import java.util.List;
 
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
+
+import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 
 //import javax.ws.rs.core.Response;
 
@@ -60,6 +64,10 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.Mongo;
 import com.mongodb.MongoException;
+import com.mongodb.gridfs.GridFS;
+import com.mongodb.gridfs.GridFSDBFile;
+import com.mongodb.gridfs.GridFSInputFile;
+
 import java.util.Date;
 import java.sql.Timestamp;
 @Path("/")
@@ -150,6 +158,8 @@ public class Gardenshift {
 //					user_crops.put("comments", "");
 //					document.put("user_crops", user_crops);
 					document.put("user_crops", new ArrayList());
+					
+					document.put("albums_picture", new ArrayList());
 					
 					collection.insert(document);
 					
@@ -527,6 +537,42 @@ public class Gardenshift {
 
 	}
 	
+	@Path("add_picture")
+	@POST
+	public Response addPictures(@FormParam("username") String username,
+			@FormParam("picture_url") String picture_url, @FormParam("picture_caption") String picture_caption  )
+			 {
+
+		/*
+		 * Add a new status to user's database
+		 */
+
+		
+		try {
+					DBCollection collection = db.getCollection("users");
+					BasicDBObject update = new BasicDBObject();
+		            update.put("username", username);
+	
+		           
+		            BasicDBObject document = new BasicDBObject();
+	            
+	                document.put("picture_url", picture_url);
+	                document.put("picture_caption", picture_caption);
+	                document.put("picture_date", new Date().toString());               
+	                
+	                BasicDBObject temp = new BasicDBObject();
+	                temp.put("$push", new BasicDBObject("albums_picture", document));
+
+	                collection.update(update, temp, true, true);
+
+	                return Response.status(200).entity("success").build();
+
+		} catch (Exception e) {
+			return Response.status(503).entity("failed").build();
+		}
+
+	}
+	
 	@GET
 	@Path("delete_status/{username}/{date}")
 	@Produces("application/json")
@@ -584,64 +630,67 @@ public class Gardenshift {
 
 	}
 
-	// @POST
-	// @Path("/upload")
-	// @Consumes("multipart/form-data")
-	// public Response uploadFile(@MultipartForm FileUploadForm form) {
-	//
-	// String fileName = "/home/hilaykhatri/test211.txt";
-	//
-	// try {
-	// writeFile(form.getData(), fileName);
-	// } catch (IOException e) {
-	// e.printStackTrace();
-	// }
-	//
-	// System.out.println("Done");
-	//
-	// return Response.status(200)
-	// .entity("uploadFile is called, Uploaded file name : " +
-	// fileName).build();
-	//
-	// }
-	//
-	// // save to somewhere
-	// private void writeFile(byte[] content, String filename) throws
-	// IOException {
-	//
-	//
-	//
-	// DBCollection collection = db.getCollection("images");
-	//
-	//
-	//
-	// // create a "photo" namespace
-	// GridFS gfsPhoto = new GridFS(db, "photo");
-	//
-	// // get image file from local drive
-	// GridFSInputFile gfsFile = gfsPhoto.createFile(content);
-	//
-	// // set a new filename for identify purpose
-	// gfsFile.setFilename("hilay");
-	//
-	// // save the image file into mongoDB
-	// gfsFile.save();
-	//
-	// // print the result
-	// DBCursor cursor = gfsPhoto.getFileList();
-	// while (cursor.hasNext()) {
-	// System.out.println(cursor.next());
-	// }
-	//
-	// // get image file by it's filename
-	// GridFSDBFile imageForOutput = gfsPhoto.findOne("hilay");
-	//
-	// // save it into a new image file
-	// imageForOutput.writeTo("/home/hilaykhatri/test1hilay.txt");
-	//
-	// System.out.println("Done");
-	//
-	// }
+	 @POST
+	 @Path("/upload")
+	 @Consumes("multipart/form-data")
+	 public Response uploadFile(@MultipartForm FileUploadForm form) {
+		 
+		 
+	
+	 String fileName = "image" +  new Date().getSeconds();
+	 System.out.println(fileName);
+	
+	 try {
+	 writeFile(form.getData(), fileName);
+	 } catch (IOException e) {
+	 e.printStackTrace();
+	 }
+	
+	 System.out.println("Done");
+	
+	 return Response.status(200)
+	 .entity("uploadFile is called, Uploaded file name : " +
+	 fileName).build();
+	
+	 }
+	
+	 // save to somewhere
+	 private void writeFile(byte[] content, String filename) throws
+	 IOException {
+	
+	
+	
+	 DBCollection collection = db.getCollection("images");
+	
+	
+	
+	 // create a "photo" namespace
+	 GridFS gfsPhoto = new GridFS(db, "photo");
+	
+	 // get image file from local drive
+	 GridFSInputFile gfsFile = gfsPhoto.createFile(content);
+	
+	 // set a new filename for identify purpose
+	 gfsFile.setFilename(filename);
+	
+	 // save the image file into mongoDB
+	 gfsFile.save();
+	
+	 // print the result
+	 DBCursor cursor = gfsPhoto.getFileList();
+	 while (cursor.hasNext()) {
+	 System.out.println(cursor.next());
+	 }
+	
+	 // get image file by it's filename
+	 GridFSDBFile imageForOutput = gfsPhoto.findOne(filename);
+	
+	 // save it into a new image file
+	 imageForOutput.writeTo("/var/lib/stickshift/7c78d362cd84455f8fce81ab1f933633/php-5.3/repo/php/images" + filename);
+	
+	 System.out.println("Done");
+	
+	 }
 	
 	
 	
